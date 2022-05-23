@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder,FormGroup } from '@angular/forms';
+import { FormBuilder,FormGroup,Validators } from '@angular/forms';
 import { MyapiService } from '../services/myapi.service';
 import { UserModel } from './dashboard.model';
 @Component({
@@ -11,6 +11,20 @@ export class DashboardComponent implements OnInit {
   formValue !: FormGroup;
   userModelObj:UserModel=new UserModel();
   userData:any=[];
+  title=true;
+  add=true;
+  setValues(){
+    this.title=true;
+    this.add=true;
+  
+    this.formValue.controls['FirstName'].setValue("")
+    this.formValue.controls['LastName'].setValue("")
+    this.formValue.controls['Email'].setValue("")
+    this.formValue.controls['City'].setValue("")
+    this.formValue.controls['State'].setValue("")
+    this.formValue.controls['Zip'].setValue("")
+    this.formValue.controls['Phone'].setValue("")
+  }
   constructor(private formbuilder: FormBuilder,private api:MyapiService) { }
   getUser(){
     this.api.getUser().subscribe(res=>{
@@ -46,6 +60,8 @@ export class DashboardComponent implements OnInit {
     })
   }
   postData(user:any){
+    this.add=false;
+    this.title=false;
     this.userModelObj.id=user.id;
     this.formValue.controls['FirstName'].setValue(user.FirstName)
     this.formValue.controls['LastName'].setValue(user.LastName)
@@ -54,6 +70,7 @@ export class DashboardComponent implements OnInit {
     this.formValue.controls['State'].setValue(user.State)
     this.formValue.controls['Zip'].setValue(user.Zip)
     this.formValue.controls['Phone'].setValue(user.Phone)
+    
   }
   updateUserDetails(){
     this.userModelObj.FirstName=this.formValue.value.FirstName;
@@ -67,18 +84,20 @@ export class DashboardComponent implements OnInit {
       alert("user updated");
       let canc=document.getElementById("cancel");
       canc?.click()
+      this.add=true;
+      this.title=true;
       this.getUser();
     })
   }
   ngOnInit(): void {
     this.formValue=this.formbuilder.group({
-      FirstName:[''],
-      LastName:[''],
-      Email:[''],
-      City:[''],
-      State:[''],
-      Zip:[''],
-      Phone:['']
+      FirstName:['',Validators.required],
+      LastName:['',Validators.required],
+      Email:['',Validators.required,],
+      City:['',Validators.required],
+      State:['',Validators.required],
+      Zip:['',Validators.required],
+      Phone:['',Validators.required]
     })
     this.getUser();
   }
